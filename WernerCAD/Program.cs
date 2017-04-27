@@ -22,6 +22,7 @@ namespace WernerCAD
 		[STAThread]
 		private static void Main(string[] args)
 		{
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new MainForm());

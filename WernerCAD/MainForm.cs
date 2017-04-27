@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Diagnostics;
-
+using System.Globalization;
 
 namespace WernerCAD
 {
@@ -24,58 +24,112 @@ namespace WernerCAD
 	/// </summary>
 	public partial class MainForm : Form
 	{
-		List<PointF> Punkte;
+        List<Tuple<String, PointF?>> Lines = new List<Tuple<string, PointF?>> ();
+
 		Matrix TransformationMatrix;
-		public MainForm()
+
+        OpenFileDialog OpenDialog;
+        SaveFileDialog SaveDialog;
+
+
+        public MainForm()
 		{
-			//
-			// The InitializeComponent() call is required for Windows Forms designer support.
-			//
 			InitializeComponent();
-			
-			//
-			// TODO: Add constructor code after the InitializeComponent() call.
-			//
-		}
+
+
+            SaveDialog = new SaveFileDialog ();
+            SaveDialog.Title = "Destination File";
+            SaveDialog.Filter = "TAP-Dateien(*.tap)|*.tap";
+
+
+            OpenDialog = new OpenFileDialog ();
+            OpenDialog.Title = "Source File";
+            OpenDialog.Filter = "TAP-Dateien(*.tap)|*.tap";
+        }
+        void TransformPoints()
+        {
+            List<PointF> list = new List<PointF> ();
+            foreach (Tuple<String, PointF?> l in Lines)
+            {
+                if (l.Item2 != null)
+                {
+                    list.Add ( (PointF)l.Item2 );
+                }
+            }
+            PointF[] pointArr = list.ToArray ();
+            TransformationMatrix.TransformPoints ( pointArr );
+
+            List<Tuple<String, PointF?>> newLines = new List<Tuple<string, PointF?>> ();
+
+            int i = 0;
+            foreach (Tuple<String, PointF?> l in Lines)
+            {
+                if (l.Item2 != null)
+                {
+                    newLines.Add ( new Tuple<string, PointF?> ( l.Item1, pointArr[i++] ) );
+                }
+
+                else
+                {
+                    newLines.Add ( new Tuple<string, PointF?> ( l.Item1, null ) );
+                }
+            }
+
+            Lines = newLines;
+        }
+
 		
-		void TransformPoints(PointF soll, PointF ist)
+		void CalculateMatrix(PointF soll, PointF ist)
 		{
-			PointF[] points = Punkte.ToArray();
-			TransformationMatrix.TransformPoints(points);
-			TransformationMatrix.
-			
+            TransformationMatrix = new Matrix ();
+            double angleRad = Math.Atan2 ( soll.X * ist.Y - soll.Y * ist.X, soll.X * ist.X + soll.Y * ist.Y );
+            double angleDeg = angleRad * 180 / Math.PI;
+            TransformationMatrix.RotateAt ( -(float)angleDeg, PointF.Empty );
+            Debug.WriteLine ( "Angle: " + angleDeg );
 		}
-		void OpenFileDialog1FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+
+		void ReadFile ()
 		{
 			try
 			{
-				using (StreamReader r = new StreamReader ( openFileDialog1.FileName ))
+				using (StreamReader r = new StreamReader ( SourceFileLabel.Text ))
 				{
 					string line;
-					float X, Y;
-					
+					float lastX = 0, lastY = 0;
+                    
 					while ((line = r.ReadLine()) != null)
 					{
-						Match matchx = Regex.Match(line, @"X([0-9\.]+)");
-						Match matchy = Regex.Match(line, @"Y([0-9\.]+)");
-						
-						if ( matchx.Success )
+						Match otherMatch = Regex.Match ( line, @"[A-WZ][0-9\.]+" );
+                        Match xMatch = Regex.Match ( line, @"X([0-9\.]+)" );
+                        Match yMatch = Regex.Match ( line, @"Y([0-9\.]+)" );
+
+
+                        string other = "";
+
+                        while ( otherMatch.Success )
 						{
-							String s = matchx.Groups[1].Value;
-							X = Convert.ToSingle(s);
-						}
-						
-						
-						
-						if ( matchy.Success )
-						{
-							String s = matchy.Groups[1].Value;
-							Y = Convert.ToSingle(s);
-						}
-						
-						if ( matchx.Success || matchy.Success )
-							Punkte.Add ( new PointF ( X, Y ) );
-					}
+                            other += otherMatch.Groups[0].Value + " ";
+                            otherMatch = otherMatch.NextMatch ();
+                        }
+                        
+                        if (xMatch.Success)
+                        {
+                            lastX = Convert.ToSingle ( xMatch.Groups[1].Value );
+                        }
+
+                        if (yMatch.Success)
+                        {
+                            lastY = Convert.ToSingle ( yMatch.Groups[1].Value );
+                        }
+
+                        PointF? point;
+                        if (!xMatch.Success && !yMatch.Success)
+                            point = null;
+                        else
+                            point = new PointF ( lastX, lastY );
+
+                        Lines.Add ( new Tuple <string, PointF?> ( other, point ) );
+                    }
 				}
 			}
 			
@@ -83,11 +137,57 @@ namespace WernerCAD
 			{
 				MessageBox.Show ( ex.ToString());
 			}
-		}
-		
-		void Button1Click(object sender, EventArgs e)
-		{
-			openFileDialog1.ShowDialog ();
-		}
-	}
+
+            CalculateMatrix (new PointF(float.Parse(textBoxSollX.Text), float.Parse ( textBoxSollY.Text )), new PointF ( float.Parse ( textBoxIstX.Text ), float.Parse ( textBoxIstY.Text ) ) );
+            TransformPoints ();
+        }
+
+        void Button1Click ( object sender, EventArgs e )
+        {
+            ReadFile ();
+
+            progressBar1.Value = 50;
+
+            string output = "";
+            foreach (var l in Lines)
+            {
+                String line = "";
+                line += l.Item1;
+                if (l.Item2 != null)
+                {
+                    line += " G0 X" + l.Item2.Value.X.ToString ( CultureInfo.InvariantCulture );
+                    line += " Y" + l.Item2.Value.Y.ToString ( CultureInfo.InvariantCulture );
+                }
+
+                output += line + Environment.NewLine;
+            }
+
+            if (File.Exists ( SaveDialog.FileName ))
+                File.Delete ( SaveDialog.FileName );
+
+            File.WriteAllText ( SaveDialog.FileName, output );
+
+            progressBar1.Value = 100;
+
+            MessageBox.Show ( "Successfully converted .TAP File!" );
+        }
+
+        private void MainForm_Load ( object sender, EventArgs e )
+        {
+
+        }
+
+        private void buttonOpen_Click ( object sender, EventArgs e )
+        {
+            if (OpenDialog.ShowDialog () == DialogResult.OK)
+                SourceFileLabel.Text = OpenDialog.FileName;
+
+        }
+
+        private void buttonSave_Click ( object sender, EventArgs e )
+        {
+            if (SaveDialog.ShowDialog () == DialogResult.OK)
+                DestFileLabel.Text = SaveDialog.FileName;
+        }
+    }
 }
