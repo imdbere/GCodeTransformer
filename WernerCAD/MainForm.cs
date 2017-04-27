@@ -36,7 +36,6 @@ namespace WernerCAD
 		{
 			InitializeComponent();
 
-
             SaveDialog = new SaveFileDialog ();
             SaveDialog.Title = "Destination File";
             SaveDialog.Filter = "TAP-Dateien(*.tap)|*.tap";
@@ -49,7 +48,7 @@ namespace WernerCAD
         void TransformPoints()
         {
             List<PointF> list = new List<PointF> ();
-            foreach (Tuple<String, PointF?> l in Lines)
+            foreach (var l in Lines)
             {
                 if (l.Item2 != null)
                 {
@@ -62,7 +61,7 @@ namespace WernerCAD
             List<Tuple<String, PointF?>> newLines = new List<Tuple<string, PointF?>> ();
 
             int i = 0;
-            foreach (Tuple<String, PointF?> l in Lines)
+            foreach (var l in Lines)
             {
                 if (l.Item2 != null)
                 {
@@ -153,11 +152,17 @@ namespace WernerCAD
 
         void Button1Click ( object sender, EventArgs e )
         {
+            if (textBoxIstX.Text == "" || textBoxIstY.Text == "" || textBoxSollX.Text == "" || textBoxSollY.Text == "" || SourceFileLabel.Text == "" || DestFileLabel.Text == "")
+            {
+                MessageBox.Show("Please fill all required fields!");
+                return;
+            }
             ReadFile ();
 
             try
             {
                 progressBar1.Value = 50;
+                String formatString = "N" + numericUpDownDecCount.Value;
 
                 string output = "";
                 foreach (var l in Lines)
@@ -166,8 +171,8 @@ namespace WernerCAD
                     line += l.Item1;
                     if (l.Item2 != null)
                     {
-                        line += " X" + l.Item2.Value.X.ToString ( CultureInfo.InvariantCulture );
-                        line += " Y" + l.Item2.Value.Y.ToString ( CultureInfo.InvariantCulture );
+                        line += " X" + l.Item2.Value.X.ToString (formatString, CultureInfo.InvariantCulture );
+                        line += " Y" + l.Item2.Value.Y.ToString (formatString, CultureInfo.InvariantCulture );
                     }
 
                     output += line + Environment.NewLine;
