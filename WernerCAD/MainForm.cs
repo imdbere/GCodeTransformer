@@ -138,38 +138,56 @@ namespace WernerCAD
 				MessageBox.Show ( ex.ToString());
 			}
 
-            CalculateMatrix (new PointF(float.Parse(textBoxSollX.Text), float.Parse ( textBoxSollY.Text )), new PointF ( float.Parse ( textBoxIstX.Text ), float.Parse ( textBoxIstY.Text ) ) );
-            TransformPoints ();
+
+            try
+            {
+                CalculateMatrix ( new PointF ( float.Parse ( textBoxSollX.Text ), float.Parse ( textBoxSollY.Text ) ), new PointF ( float.Parse ( textBoxIstX.Text ), float.Parse ( textBoxIstY.Text ) ) );
+                TransformPoints ();
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show ( ex.ToString () );
+            }
         }
 
         void Button1Click ( object sender, EventArgs e )
         {
             ReadFile ();
 
-            progressBar1.Value = 50;
-
-            string output = "";
-            foreach (var l in Lines)
+            try
             {
-                String line = "";
-                line += l.Item1;
-                if (l.Item2 != null)
+                progressBar1.Value = 50;
+
+                string output = "";
+                foreach (var l in Lines)
                 {
-                    line += " G0 X" + l.Item2.Value.X.ToString ( CultureInfo.InvariantCulture );
-                    line += " Y" + l.Item2.Value.Y.ToString ( CultureInfo.InvariantCulture );
+                    String line = "";
+                    line += l.Item1;
+                    if (l.Item2 != null)
+                    {
+                        line += " X" + l.Item2.Value.X.ToString ( CultureInfo.InvariantCulture );
+                        line += " Y" + l.Item2.Value.Y.ToString ( CultureInfo.InvariantCulture );
+                    }
+
+                    output += line + Environment.NewLine;
                 }
 
-                output += line + Environment.NewLine;
+                if (File.Exists ( SaveDialog.FileName ))
+                    File.Delete ( SaveDialog.FileName );
+
+                File.WriteAllText ( SaveDialog.FileName, output );
+
+                progressBar1.Value = 100;
+
+                MessageBox.Show ( "Successfully converted .TAP File!" );
             }
 
-            if (File.Exists ( SaveDialog.FileName ))
-                File.Delete ( SaveDialog.FileName );
-
-            File.WriteAllText ( SaveDialog.FileName, output );
-
-            progressBar1.Value = 100;
-
-            MessageBox.Show ( "Successfully converted .TAP File!" );
+            catch (Exception ex)
+            {
+                MessageBox.Show ( ex.ToString () );
+                progressBar1.Value = 0;
+            }
         }
 
         private void MainForm_Load ( object sender, EventArgs e )

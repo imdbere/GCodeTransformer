@@ -37,6 +37,7 @@ namespace WernerCAD
 		/// </summary>
 		private void InitializeComponent()
 		{
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.buttonStart = new System.Windows.Forms.Button();
             this.SourceFileLabel = new System.Windows.Forms.TextBox();
             this.DestFileLabel = new System.Windows.Forms.TextBox();
@@ -111,14 +112,14 @@ namespace WernerCAD
             // 
             this.textBoxSollX.Location = new System.Drawing.Point(41, 36);
             this.textBoxSollX.Name = "textBoxSollX";
-            this.textBoxSollX.Size = new System.Drawing.Size(54, 22);
+            this.textBoxSollX.Size = new System.Drawing.Size(72, 22);
             this.textBoxSollX.TabIndex = 5;
             // 
             // textBoxSollY
             // 
             this.textBoxSollY.Location = new System.Drawing.Point(41, 65);
             this.textBoxSollY.Name = "textBoxSollY";
-            this.textBoxSollY.Size = new System.Drawing.Size(54, 22);
+            this.textBoxSollY.Size = new System.Drawing.Size(72, 22);
             this.textBoxSollY.TabIndex = 6;
             // 
             // groupBox1
@@ -129,7 +130,7 @@ namespace WernerCAD
             this.groupBox1.Controls.Add(this.textBoxSollY);
             this.groupBox1.Location = new System.Drawing.Point(12, 37);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(120, 112);
+            this.groupBox1.Size = new System.Drawing.Size(144, 112);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Sollpunkt";
@@ -158,9 +159,9 @@ namespace WernerCAD
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.textBoxIstX);
             this.groupBox2.Controls.Add(this.textBoxIstY);
-            this.groupBox2.Location = new System.Drawing.Point(246, 37);
+            this.groupBox2.Location = new System.Drawing.Point(219, 37);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(120, 112);
+            this.groupBox2.Size = new System.Drawing.Size(147, 112);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Istpunkt";
@@ -187,14 +188,14 @@ namespace WernerCAD
             // 
             this.textBoxIstX.Location = new System.Drawing.Point(41, 36);
             this.textBoxIstX.Name = "textBoxIstX";
-            this.textBoxIstX.Size = new System.Drawing.Size(54, 22);
+            this.textBoxIstX.Size = new System.Drawing.Size(70, 22);
             this.textBoxIstX.TabIndex = 5;
             // 
             // textBoxIstY
             // 
             this.textBoxIstY.Location = new System.Drawing.Point(41, 65);
             this.textBoxIstY.Name = "textBoxIstY";
-            this.textBoxIstY.Size = new System.Drawing.Size(54, 22);
+            this.textBoxIstY.Size = new System.Drawing.Size(70, 22);
             this.textBoxIstY.TabIndex = 6;
             // 
             // label5
@@ -259,9 +260,12 @@ namespace WernerCAD
             this.Controls.Add(this.DestFileLabel);
             this.Controls.Add(this.SourceFileLabel);
             this.Controls.Add(this.buttonStart);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
+            this.MaximizeBox = false;
             this.Name = "MainForm";
-            this.Text = "WernerCAD";
+            this.Text = "WernerCAD Gold Edition";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
