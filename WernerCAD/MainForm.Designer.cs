@@ -74,12 +74,12 @@ namespace WernerCAD
             this.buttonStart.TabIndex = 0;
             this.buttonStart.Text = "Convert";
             this.buttonStart.UseVisualStyleBackColor = true;
-            this.buttonStart.Click += new System.EventHandler(this.Button1Click);
+            this.buttonStart.Click += new System.EventHandler(this.ButtonStartClick);
             // 
             // SourceFileLabel
             // 
             this.SourceFileLabel.Location = new System.Drawing.Point(70, 171);
-            this.SourceFileLabel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SourceFileLabel.Margin = new System.Windows.Forms.Padding(2);
             this.SourceFileLabel.Name = "SourceFileLabel";
             this.SourceFileLabel.Size = new System.Drawing.Size(150, 20);
             this.SourceFileLabel.TabIndex = 1;
@@ -87,7 +87,7 @@ namespace WernerCAD
             // DestFileLabel
             // 
             this.DestFileLabel.Location = new System.Drawing.Point(70, 194);
-            this.DestFileLabel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.DestFileLabel.Margin = new System.Windows.Forms.Padding(2);
             this.DestFileLabel.Name = "DestFileLabel";
             this.DestFileLabel.Size = new System.Drawing.Size(150, 20);
             this.DestFileLabel.TabIndex = 2;
@@ -95,7 +95,7 @@ namespace WernerCAD
             // buttonOpen
             // 
             this.buttonOpen.Location = new System.Drawing.Point(233, 168);
-            this.buttonOpen.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.buttonOpen.Margin = new System.Windows.Forms.Padding(2);
             this.buttonOpen.Name = "buttonOpen";
             this.buttonOpen.Size = new System.Drawing.Size(22, 19);
             this.buttonOpen.TabIndex = 3;
@@ -106,7 +106,7 @@ namespace WernerCAD
             // buttonSave
             // 
             this.buttonSave.Location = new System.Drawing.Point(233, 194);
-            this.buttonSave.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.buttonSave.Margin = new System.Windows.Forms.Padding(2);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(22, 19);
             this.buttonSave.TabIndex = 4;
@@ -117,7 +117,7 @@ namespace WernerCAD
             // textBoxSollX
             // 
             this.textBoxSollX.Location = new System.Drawing.Point(31, 29);
-            this.textBoxSollX.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxSollX.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxSollX.Name = "textBoxSollX";
             this.textBoxSollX.Size = new System.Drawing.Size(55, 20);
             this.textBoxSollX.TabIndex = 5;
@@ -125,7 +125,7 @@ namespace WernerCAD
             // textBoxSollY
             // 
             this.textBoxSollY.Location = new System.Drawing.Point(31, 53);
-            this.textBoxSollY.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxSollY.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxSollY.Name = "textBoxSollY";
             this.textBoxSollY.Size = new System.Drawing.Size(55, 20);
             this.textBoxSollY.TabIndex = 6;
@@ -137,9 +137,9 @@ namespace WernerCAD
             this.groupBox1.Controls.Add(this.textBoxSollX);
             this.groupBox1.Controls.Add(this.textBoxSollY);
             this.groupBox1.Location = new System.Drawing.Point(9, 30);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox1.Size = new System.Drawing.Size(108, 91);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
@@ -172,9 +172,9 @@ namespace WernerCAD
             this.groupBox2.Controls.Add(this.textBoxIstX);
             this.groupBox2.Controls.Add(this.textBoxIstY);
             this.groupBox2.Location = new System.Drawing.Point(164, 30);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox2.Size = new System.Drawing.Size(110, 91);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
@@ -203,7 +203,7 @@ namespace WernerCAD
             // textBoxIstX
             // 
             this.textBoxIstX.Location = new System.Drawing.Point(31, 29);
-            this.textBoxIstX.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxIstX.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxIstX.Name = "textBoxIstX";
             this.textBoxIstX.Size = new System.Drawing.Size(54, 20);
             this.textBoxIstX.TabIndex = 5;
@@ -211,7 +211,7 @@ namespace WernerCAD
             // textBoxIstY
             // 
             this.textBoxIstY.Location = new System.Drawing.Point(31, 53);
-            this.textBoxIstY.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxIstY.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxIstY.Name = "textBoxIstY";
             this.textBoxIstY.Size = new System.Drawing.Size(54, 20);
             this.textBoxIstY.TabIndex = 6;
@@ -261,7 +261,7 @@ namespace WernerCAD
             // progressBar1
             // 
             this.progressBar1.Location = new System.Drawing.Point(8, 372);
-            this.progressBar1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.progressBar1.Margin = new System.Windows.Forms.Padding(2);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(262, 19);
             this.progressBar1.TabIndex = 14;

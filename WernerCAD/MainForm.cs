@@ -24,13 +24,8 @@ namespace WernerCAD
 	/// </summary>
 	public partial class MainForm : Form
 	{
-        List<Tuple<String, PointF?>> Lines = new List<Tuple<string, PointF?>> ();
-
-		Matrix TransformationMatrix;
-
         OpenFileDialog OpenDialog;
         SaveFileDialog SaveDialog;
-
 
         public MainForm()
 		{
@@ -38,17 +33,17 @@ namespace WernerCAD
 
             SaveDialog = new SaveFileDialog ();
             SaveDialog.Title = "Destination File";
-            SaveDialog.Filter = "TAP-Dateien(*.tap)|*.tap";
-
+            SaveDialog.Filter = "TAP-Dateien(*.tap)|*.tap|GCode-Dateien(*.gcode)|*.gcode";
 
             OpenDialog = new OpenFileDialog ();
             OpenDialog.Title = "Source File";
-            OpenDialog.Filter = "TAP-Dateien(*.tap)|*.tap";
+            OpenDialog.Filter = "TAP-Dateien(*.tap)|*.tap|GCode-Dateien(*.gcode)|*.gcode";
         }
-        void TransformPoints()
+
+        List<Tuple<string, PointF?>> TransformLines(Matrix matrix, List<Tuple<string, PointF?>> lines)
         {
             List<PointF> list = new List<PointF> ();
-            foreach (var l in Lines)
+            foreach (var l in lines)
             {
                 if (l.Item2 != null)
                 {
@@ -56,12 +51,12 @@ namespace WernerCAD
                 }
             }
             PointF[] pointArr = list.ToArray ();
-            TransformationMatrix.TransformPoints ( pointArr );
+            matrix.TransformPoints ( pointArr );
 
             List<Tuple<String, PointF?>> newLines = new List<Tuple<string, PointF?>> ();
 
             int i = 0;
-            foreach (var l in Lines)
+            foreach (var l in lines)
             {
                 if (l.Item2 != null)
                 {
@@ -74,22 +69,24 @@ namespace WernerCAD
                 }
             }
 
-            Lines = newLines;
+
+            return newLines;
         }
 
-		
-		void CalculateMatrix(PointF soll, PointF ist)
+		Matrix CalculateMatrix(PointF soll, PointF ist)
 		{
-            TransformationMatrix = new Matrix ();
+            Matrix transformationMatrix = new Matrix ();
             double angleRad = Math.Atan2 ( soll.X * ist.Y - soll.Y * ist.X, soll.X * ist.X + soll.Y * ist.Y );
             double angleDeg = angleRad * 180 / Math.PI;
-            TransformationMatrix.RotateAt ( -(float)angleDeg, PointF.Empty );
+            transformationMatrix.RotateAt ( -(float)angleDeg, PointF.Empty );
             Debug.WriteLine ( "Angle: " + angleDeg );
+            return transformationMatrix;
 		}
 
-		void ReadFile ()
+        List<Tuple<String, PointF?>> ReadFile ()
 		{
-			try
+            List<Tuple<String, PointF?>> lines = new List<Tuple<string, PointF?>>();
+            try
 			{
 				using (StreamReader r = new StreamReader ( SourceFileLabel.Text ))
 				{
@@ -98,10 +95,14 @@ namespace WernerCAD
                     
 					while ((line = r.ReadLine()) != null)
 					{
+                        if (line.Contains(';'))
+                            line = line.Split(';')[0];
+                        if (line == "")
+                            continue;
+
 						Match otherMatch = Regex.Match ( line, @"[A-WZ][0-9\.]+" );
                         Match xMatch = Regex.Match ( line, @"X([0-9\.]+)" );
                         Match yMatch = Regex.Match ( line, @"Y([0-9\.]+)" );
-
 
                         string other = "";
 
@@ -127,7 +128,7 @@ namespace WernerCAD
                         else
                             point = new PointF ( lastX, lastY );
 
-                        Lines.Add ( new Tuple <string, PointF?> ( other, point ) );
+                        lines.Add ( new Tuple <string, PointF?> ( other, point ) );
                     }
 				}
 			}
@@ -140,24 +141,29 @@ namespace WernerCAD
 
             try
             {
-                CalculateMatrix ( new PointF ( float.Parse ( textBoxSollX.Text ), float.Parse ( textBoxSollY.Text ) ), new PointF ( float.Parse ( textBoxIstX.Text ), float.Parse ( textBoxIstY.Text ) ) );
-                TransformPoints ();
+                PointF soll = new PointF(float.Parse(textBoxSollX.Text), float.Parse(textBoxSollY.Text));
+                PointF ist  = new PointF(float.Parse(textBoxIstX.Text), float.Parse(textBoxIstY.Text));
+                Matrix matrix = CalculateMatrix(soll, ist);
+
+                return TransformLines(matrix, lines);
+
             }
 
             catch (Exception ex)
             {
                 MessageBox.Show ( ex.ToString () );
+                return null;
             }
         }
 
-        void Button1Click ( object sender, EventArgs e )
+        void ButtonStartClick ( object sender, EventArgs e )
         {
             if (textBoxIstX.Text == "" || textBoxIstY.Text == "" || textBoxSollX.Text == "" || textBoxSollY.Text == "" || SourceFileLabel.Text == "" || DestFileLabel.Text == "")
             {
                 MessageBox.Show("Please fill all required fields!");
                 return;
             }
-            ReadFile ();
+            List<Tuple<String, PointF?>> lines = ReadFile ();
 
             try
             {
@@ -165,7 +171,7 @@ namespace WernerCAD
                 String formatString = "N" + numericUpDownDecCount.Value;
 
                 string output = "";
-                foreach (var l in Lines)
+                foreach (var l in lines)
                 {
                     String line = "";
                     line += l.Item1;
@@ -177,15 +183,9 @@ namespace WernerCAD
 
                     output += line + Environment.NewLine;
                 }
-
-                if (File.Exists ( SaveDialog.FileName ))
-                    File.Delete ( SaveDialog.FileName );
-
                 File.WriteAllText ( SaveDialog.FileName, output );
-
                 progressBar1.Value = 100;
-
-                MessageBox.Show ( "Successfully converted .TAP File!" );
+                MessageBox.Show ( "Successfully converted File!" );
             }
 
             catch (Exception ex)
