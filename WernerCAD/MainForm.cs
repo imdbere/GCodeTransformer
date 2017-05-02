@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace WernerCAD
 {
@@ -129,6 +130,7 @@ namespace WernerCAD
                             point = new PointF ( lastX, lastY );
 
                         lines.Add ( new Tuple <string, PointF?> ( other, point ) );
+                        
                     }
 				}
 			}
@@ -146,7 +148,7 @@ namespace WernerCAD
                 Matrix matrix = CalculateMatrix(soll, ist);
 
                 return TransformLines(matrix, lines);
-
+                
             }
 
             catch (Exception ex)
@@ -156,41 +158,60 @@ namespace WernerCAD
             }
         }
 
-        void ButtonStartClick ( object sender, EventArgs e )
+        async void ButtonStartClick ( object sender, EventArgs e )
         {
             if (textBoxIstX.Text == "" || textBoxIstY.Text == "" || textBoxSollX.Text == "" || textBoxSollY.Text == "" || SourceFileLabel.Text == "" || DestFileLabel.Text == "")
             {
                 MessageBox.Show("Please fill all required fields!");
                 return;
             }
-            List<Tuple<String, PointF?>> lines = ReadFile ();
+            await Task.Run(() => Process());
+            
+        }
+
+        void ChangeProgress(int progress)
+        {
+            BeginInvoke((MethodInvoker) delegate
+            {
+                progressBar1.Value = progress;
+            });
+        }
+
+        void Process()
+        {
+            ChangeProgress(20);
+            List<Tuple<String, PointF?>> lines = ReadFile();
 
             try
             {
-                progressBar1.Value = 50;
+                ChangeProgress(50);
                 String formatString = "N" + numericUpDownDecCount.Value;
 
-                string output = "";
+                StreamWriter writer = new StreamWriter(SaveDialog.FileName);
+                //string output = "";
+                int i = 0;
                 foreach (var l in lines)
                 {
+                    i++;
                     String line = "";
                     line += l.Item1;
                     if (l.Item2 != null)
                     {
-                        line += " X" + l.Item2.Value.X.ToString (formatString, CultureInfo.InvariantCulture );
-                        line += " Y" + l.Item2.Value.Y.ToString (formatString, CultureInfo.InvariantCulture );
+                        line += " X" + l.Item2.Value.X.ToString(formatString, CultureInfo.InvariantCulture);
+                        line += " Y" + l.Item2.Value.Y.ToString(formatString, CultureInfo.InvariantCulture);
                     }
-
-                    output += line + Environment.NewLine;
+                    writer.WriteLine(line);
+                    ChangeProgress(50 + (i * 50 / lines.Count));
+                    //output += line + Environment.NewLine;
                 }
-                File.WriteAllText ( SaveDialog.FileName, output );
-                progressBar1.Value = 100;
-                MessageBox.Show ( "Successfully converted File!" );
+                //File.WriteAllText ( SaveDialog.FileName, output );
+                ChangeProgress(100);
+                MessageBox.Show("Successfully converted File!");
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show ( ex.ToString () );
+                MessageBox.Show(ex.ToString());
                 progressBar1.Value = 0;
             }
         }
